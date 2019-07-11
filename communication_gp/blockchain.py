@@ -18,6 +18,15 @@ class Blockchain(object):
 
         self.new_block(previous_hash=1, proof=100)
 
+    def create_genesis_block(self):
+        block = {
+            'index': 1,
+            'timestamp': 0,
+            'transactions': [],
+            'proof': 90,
+            'previous_hash': 1,
+        }
+
     def new_block(self, proof, previous_hash=None):
         """
         Create a new Block in the Blockchain
