@@ -326,11 +326,13 @@ def consensus():
     last_block = blockchain.last_block
 
     if new_block['index'] == last_block ['index'] + 1:
+        
         if new_block['previous_hash'] == blockchain.hash(last_block):
-            if blockchain.valid_proof(last_block['proof'], new_block["proof"])
+            
+            if blockchain.valid_proof(last_block['proof'],new_block['proof']):
 
-            blockchain.chain.append(new_block)
-            return 'block accepted in /nodes/resolve', 200
+                blockchain.chain.append(new_block)
+                return 'block accepted in /nodes/resolve', 200
 
     return 'block rejected in /nodes/resolve', 200 
 
@@ -356,5 +358,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     else:
-        port = 5000
+        port = 5001
     app.run(host='0.0.0.0', port=port)
