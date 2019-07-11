@@ -53,7 +53,7 @@ class Blockchain(object):
 
         # Reset the current list of transactions
         self.current_transactions = []
-
+        self.broadcast_new_block(block)
         self.chain.append(block)
         return block
 
@@ -322,6 +322,17 @@ def new_block():
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = blockchain.resolve_conflicts()
+    new_block = value['block']
+    last_block = blockchain.last_block
+
+    if new_block['index'] == last_block ['index'] + 1:
+        if new_block['previous_hash'] == blockchain.hash(last_block):
+            if blockchain.valid_proof(last_block['proof'], new_block["proof"])
+
+            blockchain.chain.append(new_block)
+            return 'block accepted in /nodes/resolve', 200
+
+    return 'block rejected in /nodes/resolve', 200 
 
     if replaced:
         response = {
