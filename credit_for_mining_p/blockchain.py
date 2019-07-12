@@ -249,12 +249,13 @@ def mine():
 
     values = request.get_json()
     submitted_proof = values.get('proof')
+    sender = values.get('id')
 
     if blockchain.valid_proof(last_proof, submitted_proof):
         # We must receive a reward for finding the proof.
         # The sender is "0" to signify that this node has mine a new coin
         blockchain.new_transaction(
-            sender="0",
+            sender=sender,
             recipient=node_identifier,
             amount=1,
         )
@@ -323,14 +324,15 @@ def new_transaction():
     values = request.get_json()
 
     # Check that the required fields are in the POST'ed data
-    required = ['sender', 'recipient', 'amount']
+    required = ['sender', 'recipient', 'amount', 'id']
     if not all(k in values for k in required):
         return 'Missing Values', 400
 
     # Create a new Transaction
     index = blockchain.new_transaction(values['sender'],
                                        values['recipient'],
-                                       values['amount'])
+                                       values['amount'],
+                                       values['id'])
 
     response = {'message': f'Transaction will be added to Block {index}'}
     return jsonify(response), 201
@@ -402,5 +404,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     else:
-        port = 5000
+        port = 5002
     app.run(host='0.0.0.0', port=port)

@@ -36,17 +36,31 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         node = int(sys.argv[1])
     else:
-        node = "http://localhost:5000"
+        node = "http://localhost:5002"
 
     coins_mined = 0
     # Run forever until interrupted
+    #  Load an id from that random txt file
+    file = open("my_file.txt", "r")
+    id = file.read(
+    )
+    file.close()
+    
+    if len(id) == 0:
+        file = open("my_file.txt", "w")
+        #id = uuid
+        file.write(id)
+        file.close()
+        #FIND OUT UUID *#%&*$%&*$&%(
+        # put in here somehow
+
     while True:
         # Get the last proof from the server
         r = requests.get(url=node + "/last_proof")
         data = r.json()
         new_proof = proof_of_work(data.get('proof'))
 
-        post_data = {"proof": new_proof}
+        post_data = {"proof": new_proof, "id": id}
 
         r = requests.post(url=node + "/mine", json=post_data)
         data = r.json()
