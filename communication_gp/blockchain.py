@@ -18,6 +18,22 @@ class Blockchain(object):
 
         self.new_block(previous_hash=1, proof=100)
 
+    def create_genesis_block(self):
+        """
+        create the genesis block and add to chain, 
+        will be anchor of chain, hardcoded, 
+        and identical for all nodes
+        """
+        block = {
+            'index': 1,
+            'timestamp': 0,
+            'transactions': [],
+            'proof': 90,
+            'previous_hash': 1,
+        }
+        
+        self.chain.append(block)
+
     def new_block(self, proof, previous_hash=None):
         """
         Create a new Block in the Blockchain
@@ -37,7 +53,7 @@ class Blockchain(object):
 
         # Reset the current list of transactions
         self.current_transactions = []
-
+        self.broadcast_new_block(block)
         self.chain.append(block)
         return block
 
@@ -175,6 +191,20 @@ class Blockchain(object):
 
         return False
 
+    def broadcast_new_block(self, block):
+        """
+        alert neighbors in list of nodes that a new block
+        has been mined and added to the chain
+        """
+
+        post_data = {"block": block}
+
+        for node in self.nodes:
+            r = request.post(f'http://{node}/block/new', json=post_data)
+
+            if response.status_code != 200:
+                #TODO
+                pass
 
 # Instantiate our Node
 app = Flask(__name__)
@@ -280,10 +310,31 @@ def register_nodes():
     }
     return jsonify(response), 201
 
+@app.route('/block/new', methods=['POST'])
+def new_block():
+
+    values = request.get_json()
+    required = ['block']
+    if not all(k in values for k in required):
+        return 'mission values for /block/new', 400
+
 
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = blockchain.resolve_conflicts()
+    new_block = value['block']
+    last_block = blockchain.last_block
+
+    if new_block['index'] == last_block ['index'] + 1:
+        
+        if new_block['previous_hash'] == blockchain.hash(last_block):
+            
+            if blockchain.valid_proof(last_block['proof'],new_block['proof']):
+
+                blockchain.chain.append(new_block)
+                return 'block accepted in /nodes/resolve', 200
+
+    return 'block rejected in /nodes/resolve', 200 
 
     if replaced:
         response = {
@@ -307,5 +358,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     else:
-        port = 5000
+        port = 5001
     app.run(host='0.0.0.0', port=port)
